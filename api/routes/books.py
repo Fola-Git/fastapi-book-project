@@ -1,4 +1,3 @@
-
 from typing import OrderedDict
 
 from fastapi import APIRouter, status
@@ -48,7 +47,15 @@ async def create_book(book: Book):
 async def get_books() -> OrderedDict[int, Book]:
     return db.get_books()
 
-
+@router.get("/{book_id}")
+async def get_book(book_id: int):
+    book =  db.get_book(book_id)
+    if not book:
+        return JSONResponse(status_code=404, content={"detail": "Book not found"})
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content=book.model_dump(),
+    )
 @router.put("/{book_id}", response_model=Book, status_code=status.HTTP_200_OK)
 async def update_book(book_id: int, book: Book) -> Book:
     return JSONResponse(
@@ -61,4 +68,3 @@ async def update_book(book_id: int, book: Book) -> Book:
 async def delete_book(book_id: int) -> None:
     db.delete_book(book_id)
     return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
-
